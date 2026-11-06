@@ -20,11 +20,9 @@ def env_prefix(tmp_path_factory):
     if env_prefix.exists():
         shutil.rmtree(env_prefix)
 
-    channels = (
-        "-c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge"
-    )
+    channels = "-c https://repo.prefix.dev/emscripten-forge/6x -c conda-forge"
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-32   python numpy pyjs>=2.7.1"""
+        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=4.1.0" """
     ]
 
     ret = subprocess.run(cmd, shell=True)
