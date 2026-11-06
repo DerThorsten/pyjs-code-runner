@@ -35,19 +35,32 @@ def env_prefix(tmp_path_factory):
     return env_prefix
 
 
+# browsers to test the browser-{main,worker} backends with,
+# e.g. PYJS_CODE_RUNNER_TEST_BROWSERS="chromium firefox webkit"
+TEST_BROWSERS = os.environ.get("PYJS_CODE_RUNNER_TEST_BROWSERS", "chromium").split()
+
+
 # @pytest.fixture(params=["node"])  # , "browser-main", "browser-worker"])
-@pytest.fixture(params=["browser-main", "browser-worker"])
+@pytest.fixture(
+    params=[
+        (backend, browser)
+        for backend in ["browser-main", "browser-worker"]
+        for browser in TEST_BROWSERS
+    ],
+    ids=lambda p: f"{p[0]}-{p[1]}",
+)
 def backend_cli_settings(request):
-    if request.param == "node":
+    backend, browser = request.param
+    if backend == "node":
         if ON_GITHUB_ACTIONS:
-            return request.param, [
+            return backend, [
                 "--node-binary",
                 "/home/runner/micromamba-root/envs/dev-env/bin/node",
             ]
         else:
-            return request.param, []
+            return backend, []
     else:
-        return request.param, ["--headless"]
+        return backend, ["--headless", "--browser", browser]
 
 
 @pytest.fixture
