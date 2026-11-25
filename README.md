@@ -4,13 +4,22 @@
 
 A driver to run python code in a wasm environment, almost like running vanilla python code.
 
-## Motivation
+## How it works
 
-Debugging, experimenting and testing python code from a dedicated conda environment
-in browser environment is a complex process with a lot of (complicated) steps.
+The script runs in a browser (playwright, main thread or web worker), driven by
+the JavaScript of the pyjs npm package. Where pyjs and python come from:
 
-* create the environment for emscripten
-* pack the environemtn
+* **a conda env** (`--conda-env`): an emscripten-forge env with **pyjs >= 6**.
+  Its runtime and the npm JavaScript (`lib_js/pyjs/npm`, shipped by the pyjs
+  conda package) are used, and the env is packed with empack. So exactly what
+  is installed there runs, e.g. a python, pyjs and a package that were just
+  built locally. This is what `pytester` (emscripten-forge recipe tests) uses.
+* **an npm package** (`--pyjs-npm @scope/pyjs@6.0.0`, or a local package
+  directory / `.tgz`): its own runtime and environment; extra conda packages
+  with `--package <spec>` (repeatable) are installed at runtime.
+
+Directories are mounted with `--mount <host dir>:<path in the browser>`.
+pyjs < 6 envs are not supported anymore (use pyjs-code-runner 3.x).
 
 ## Installation
 

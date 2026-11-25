@@ -1,7 +1,6 @@
 import pytest
 import subprocess
 from pathlib import Path
-import appdirs
 import shutil
 from typer.testing import CliRunner
 import os
@@ -21,8 +20,13 @@ def env_prefix(tmp_path_factory):
         shutil.rmtree(env_prefix)
 
     channels = "-c https://repo.prefix.dev/emscripten-forge/6x -c conda-forge"
+    # e.g. a local recipe build output with a freshly built pyjs, searched first
+    local_channel = os.environ.get("PYJS_CODE_RUNNER_TEST_CHANNEL")
+    if local_channel:
+        channels = f"-c {local_channel} {channels}"
+    # (pyjs >= 6: its conda package ships the npm JavaScript the runner needs)
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=4.1.0" """
+        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=6" """
     ]
 
     ret = subprocess.run(cmd, shell=True)
