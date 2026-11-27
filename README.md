@@ -40,13 +40,15 @@ micromamba create -n my_env --platform=emscripten-wasm32 \
 
 ## Development
 
-With [pixi](https://pixi.sh) (the CI runs the same task):
+With [pixi](https://pixi.sh):
 
 ```bash
+# npm mode: pyjs from the published npm package (what the CI runs)
 pixi run test                        # chromium
 pixi run test "chromium firefox webkit"
-# a local recipe build (e.g. a new pyjs), searched first:
-PYJS_CODE_RUNNER_TEST_CHANNEL=/path/to/recipes/output pixi run test
+# conda mode: an emscripten-forge env with pyjs-dev >= 6 (local); a local
+# recipe build (e.g. a new pyjs) is searched first:
+PYJS_CODE_RUNNER_TEST_CHANNEL=/path/to/recipes/output pixi run test-conda
 ```
 
 You might want to add more dependencies to this environment, depending on the code you would like to run.

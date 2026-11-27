@@ -10,6 +10,25 @@ if "GITHUB_ACTION" in os.environ:
     ON_GITHUB_ACTIONS = True
 
 
+# Where pyjs comes from in the tests:
+#   npm   (default, the CI): the published npm package PYJS_CODE_RUNNER_TEST_NPM
+#   conda (local, `pixi run test-conda`): an emscripten-forge env with
+#         pyjs-dev >= 6, e.g. from a local recipe build
+#         (PYJS_CODE_RUNNER_TEST_CHANNEL)
+TEST_MODE = os.environ.get("PYJS_CODE_RUNNER_TEST_MODE", "npm")
+TEST_NPM = os.environ.get("PYJS_CODE_RUNNER_TEST_NPM", "@derthorsten/pyjs@6.0.1")
+
+
+@pytest.fixture(scope="session")
+def pyjs_args(request):
+    """the CLI arguments that say where pyjs comes from (see TEST_MODE)"""
+    if TEST_MODE == "npm":
+        return ["--pyjs-npm", TEST_NPM]
+    if TEST_MODE == "conda":
+        return ["--conda-env", request.getfixturevalue("env_prefix")]
+    raise ValueError(f"PYJS_CODE_RUNNER_TEST_MODE: npm or conda, not {TEST_MODE!r}")
+
+
 @pytest.fixture(scope="session")
 def env_prefix(tmp_path_factory):
 
