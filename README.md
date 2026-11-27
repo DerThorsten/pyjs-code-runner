@@ -23,33 +23,30 @@ pyjs < 6 envs are not supported anymore (use pyjs-code-runner 3.x).
 
 ## Installation
 
-Currently `pyjs-code-runner` is not available on PyPI. To install it, clone the repository and install it with `pip`:
-
-We first recommend to create a new conda environment for `pyjs-code-runner`:
+`pyjs_code_runner` is on conda-forge:
 
 ```bash
-mamba create -n pyjs-code-runner -c conda-forge python
-mamba activate pyjs-code-runner
+mamba install -c conda-forge pyjs_code_runner
+playwright install chromium
 ```
 
-Then install `pyjs-code-runner`:
+You will then need an emscripten-forge environment for the code you want to run in the browser:
 
 ```bash
-git clone https://github.com/emscripten-forge/pyjs-code-runner
-cd pyjs-code-runner
-python -m pip install -e .
+micromamba create -n my_env --platform=emscripten-wasm32 \
+    -c https://repo.prefix.dev/emscripten-forge/6x -c conda-forge \
+    python numpy "pyjs-dev>=6"
 ```
 
-Then install the browser for use with Playwright:
+## Development
+
+With [pixi](https://pixi.sh) (the CI runs the same task):
 
 ```bash
-playwright install
-```
-
-You will then need another conda environment for the code you want to run in the browser. Here we specify the `emscripten-forge` channel and the `emscripten-32` platform:
-
-```bash
-mamba create -n my_env -c https://repo.mamba.pm/emscripten-forge -c https://repo.mamba.pm/conda-forge --platform=emscripten-32 python numpy pyjs
+pixi run test                        # chromium
+pixi run test "chromium firefox webkit"
+# a local recipe build (e.g. a new pyjs), searched first:
+PYJS_CODE_RUNNER_TEST_CHANNEL=/path/to/recipes/output pixi run test
 ```
 
 You might want to add more dependencies to this environment, depending on the code you would like to run.

@@ -25,8 +25,10 @@ def env_prefix(tmp_path_factory):
     if local_channel:
         channels = f"-c {local_channel} {channels}"
     # (pyjs >= 6: its conda package ships the npm JavaScript the runner needs)
+    # micromamba of the pixi env (or the one of setup-micromamba)
+    mamba = os.environ.get("MAMBA_EXE", "micromamba")
     cmd = [
-        f"""$MAMBA_EXE create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=6" """
+        f"""{mamba} create {channels} --yes --prefix {env_prefix} --platform=emscripten-wasm32 python numpy "pyjs-dev>=6" """
     ]
 
     ret = subprocess.run(cmd, shell=True)
